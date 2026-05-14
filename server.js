@@ -60,13 +60,28 @@ function escapeHtml(s) {
     .replace(/"/g, '&quot;');
 }
 
+function folderContainsChanges(node, changedByPath) {
+  for (const child of node.children || []) {
+    if (child.children) {
+      if (folderContainsChanges(child, changedByPath)) return true;
+    } else if (changedByPath.has(child.relPath)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 function renderTree(node, activeRelPath, changedByPath, linkMode = 'diff') {
   if (!node.children || node.children.length === 0) return '';
   const items = node.children
     .map((child) => {
       if (child.children) {
         const inner = renderTree(child, activeRelPath, changedByPath, linkMode);
-        return `<li class="folder">${escapeHtml(child.name)}${inner}</li>`;
+        const isActiveAncestor = activeRelPath && (activeRelPath === child.relPath || activeRelPath.startsWith(child.relPath + '/'));
+        const hasChanges = folderContainsChanges(child, changedByPath);
+        const openAttr = isActiveAncestor ? ' open' : '';
+        const changeMark = hasChanges ? '<span class="folder-change-dot" aria-hidden="true"></span>' : '';
+        return `<li><details class="folder" data-path="${escapeHtml(child.relPath)}"${openAttr}><summary><span class="caret" aria-hidden="true"></span><span class="folder-name">${escapeHtml(child.name)}</span>${changeMark}</summary>${inner}</details></li>`;
       }
       const isActive = child.relPath === activeRelPath;
       const status = changedByPath.get(child.relPath);

@@ -12,6 +12,38 @@
     connect();
   }
 
+  function persistFolderState() {
+    const tree = document.querySelector('.tree');
+    if (!tree) return;
+    const KEY = 'markserv-diff:folders-open';
+    let openSet;
+    try {
+      openSet = new Set(JSON.parse(localStorage.getItem(KEY) || '[]'));
+    } catch {
+      openSet = new Set();
+    }
+
+    tree.querySelectorAll('details.folder').forEach((d) => {
+      const p = d.dataset.path;
+      if (!p) return;
+      if (openSet.has(p) && !d.open) d.open = true;
+    });
+
+    tree.querySelectorAll('details.folder').forEach((d) => {
+      d.addEventListener('toggle', () => {
+        const p = d.dataset.path;
+        if (!p) return;
+        if (d.open) openSet.add(p);
+        else openSet.delete(p);
+        try {
+          localStorage.setItem(KEY, JSON.stringify([...openSet]));
+        } catch {
+          /* ignore quota errors */
+        }
+      });
+    });
+  }
+
   function buildMinimap() {
     const minimap = document.getElementById('minimap');
     if (!minimap) return;
@@ -77,5 +109,6 @@
     }
   }
 
+  persistFolderState();
   buildMinimap();
 })();

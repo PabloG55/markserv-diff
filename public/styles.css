@@ -65,8 +65,8 @@ a:hover {
 
 .tree ul {
   list-style: none;
-  padding-left: 12px;
-  margin: 4px 0;
+  padding-left: 14px;
+  margin: 2px 0;
   border-left: 1px dashed var(--border);
 }
 
@@ -75,14 +75,69 @@ a:hover {
   border: none;
 }
 
-.tree .folder {
-  color: var(--muted);
-  font-weight: 600;
-  margin-top: 8px;
+.tree li {
+  padding: 1px 0;
 }
 
-.tree li {
-  padding: 2px 0;
+.tree details.folder {
+  margin: 2px 0;
+}
+
+.tree details.folder > summary {
+  list-style: none;
+  cursor: pointer;
+  user-select: none;
+  color: var(--muted);
+  font-weight: 600;
+  padding: 3px 6px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tree details.folder > summary::-webkit-details-marker {
+  display: none;
+}
+
+.tree details.folder > summary:hover {
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text);
+}
+
+.tree details.folder > summary .caret {
+  width: 0;
+  height: 0;
+  border-top: 4px solid transparent;
+  border-bottom: 4px solid transparent;
+  border-left: 5px solid currentColor;
+  transition: transform 0.12s ease;
+  flex: none;
+  opacity: 0.7;
+}
+
+.tree details.folder[open] > summary .caret {
+  transform: rotate(90deg);
+}
+
+.tree .folder-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tree .folder-change-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex: none;
+  opacity: 0.6;
+}
+
+.tree details.folder[open] > summary .folder-change-dot {
+  display: none;
 }
 
 .tree a {
