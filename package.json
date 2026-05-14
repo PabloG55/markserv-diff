@@ -1,0 +1,20 @@
+{
+  "name": "markserv-diff",
+  "version": "0.1.0",
+  "description": "Browse local markdown docs in the browser with rendered git diffs. Minimal-dep alternative to markserv with a diff view layered on top.",
+  "private": true,
+  "bin": {
+    "markserv-diff": "server.js"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "audit": "npm audit --omit=dev"
+  },
+  "dependencies": {
+    "markdown-it": "14.1.1",
+    "diff": "5.2.2"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
