@@ -112,6 +112,10 @@ a:hover {
 .status-A { background: var(--add-border); }
 .status-M { background: var(--accent); }
 .status-D { background: var(--del-border); }
+.status-U {
+  background: transparent;
+  border: 1.5px solid var(--add-border);
+}
 
 .main {
   padding: 28px 40px 80px;

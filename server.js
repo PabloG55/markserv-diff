@@ -125,6 +125,12 @@ async function getChangedMap(root, base) {
       const rel = path.relative(targetDir, path.join(root, e.path));
       m.set(rel, e.status);
     }
+    const untracked = await git.untrackedFiles(root);
+    for (const u of untracked) {
+      const rel = path.relative(targetDir, path.join(root, u));
+      if (rel.startsWith('..')) continue;
+      if (!m.has(rel)) m.set(rel, 'U');
+    }
     return m;
   } catch {
     return new Map();
