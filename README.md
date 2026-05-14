@@ -10,20 +10,20 @@ Inspired by [markserv](https://github.com/markserv/markserv), but with a diff vi
 
 ## Features
 
-- 📁 File-tree sidebar of every `.md` file in a directory
-- ✨ GitHub-style Markdown rendering
-- 🔀 Three view modes per file:
+- File-tree sidebar of every `.md` file in a directory
+- GitHub-style Markdown rendering
+- Three view modes per file:
   - **View** — plain rendered Markdown
   - **Diff vs HEAD** — uncommitted changes in your working tree
   - **Diff vs main** — everything different on the current branch
-- 🧠 Adaptive diff strategy per block:
+- Adaptive diff strategy per block:
   - Small edits → inline word-level diff (red strikethrough for removed words, green for added)
   - Heavy rewrites → stacked old / new (so it stays readable)
   - Modified tables → single table with row-level highlights (no more "added one row = doubled table")
-- 🗺️ Right-side **minimap** showing the position of every change in the document — click a tick to jump
-- 🟢🔴🟠 Status dots in the sidebar mark files with uncommitted changes (added / modified / deleted)
-- ♻️ Live reload via Server-Sent Events when files change on disk
-- 🔒 Only two npm dependencies, installed with `--ignore-scripts` for a small supply-chain footprint
+- Right-side **minimap** showing the position of every change in the document — click a tick to jump
+- Status dots in the sidebar mark files with uncommitted changes (added / modified / deleted)
+- Live reload via Server-Sent Events when files change on disk
+- Only two npm dependencies, installed with `--ignore-scripts` for a small supply-chain footprint
 
 ## Install
 
