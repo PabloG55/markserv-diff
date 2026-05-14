@@ -265,34 +265,65 @@ a:hover {
   text-decoration-color: rgba(248, 81, 73, 0.6);
 }
 
-.block-modified {
-  background: var(--mod-bg);
-  border-color: rgba(187, 128, 9, 0.6);
+.block-modified-inline {
+  background: rgba(187, 128, 9, 0.06);
+  border-color: rgba(187, 128, 9, 0.45);
+  border-left: 3px solid var(--accent);
+}
+
+.block-modified-stacked {
+  background: transparent;
+  border: 1px solid rgba(187, 128, 9, 0.45);
+  border-left: 3px solid var(--accent);
   padding: 6px;
   display: grid;
   gap: 6px;
 }
 
-.block-modified .mod-before,
-.block-modified .mod-after {
-  padding: 10px 14px;
+.block-modified-stacked .mod-before,
+.block-modified-stacked .mod-after {
+  padding: 10px 14px 10px 14px;
   border-radius: 4px;
   position: relative;
 }
 
-.block-modified .mod-before {
+.block-modified-stacked .mod-before {
   background: var(--del-bg);
   border: 1px solid var(--del-border);
 }
 
-.block-modified .mod-before * {
+.block-modified-stacked .mod-before > * {
   text-decoration: line-through;
   text-decoration-color: rgba(248, 81, 73, 0.5);
 }
 
-.block-modified .mod-after {
+.block-modified-stacked .mod-after {
   background: var(--add-bg);
   border: 1px solid var(--add-border);
+}
+
+ins.word-add {
+  background: var(--add-bg);
+  color: var(--text);
+  text-decoration: none;
+  border-radius: 3px;
+  padding: 0 3px;
+  box-shadow: inset 0 -1px 0 var(--add-border);
+}
+
+del.word-del {
+  background: var(--del-bg);
+  color: var(--text);
+  text-decoration: line-through;
+  text-decoration-color: rgba(248, 81, 73, 0.6);
+  border-radius: 3px;
+  padding: 0 3px;
+  box-shadow: inset 0 -1px 0 var(--del-border);
+}
+
+ins.word-add code,
+del.word-del code {
+  background: transparent;
 }
 
 .badge {
@@ -309,6 +340,51 @@ a:hover {
 
 .badge-add { background: var(--add-border); color: #fff; }
 .badge-del { background: var(--del-border); color: #fff; }
+
+.block-table-modified {
+  padding: 0;
+  border: none;
+  background: transparent;
+}
+
+table.diff-table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 16px 0;
+}
+
+table.diff-table th,
+table.diff-table td {
+  border: 1px solid var(--border);
+  padding: 6px 12px;
+  text-align: left;
+  vertical-align: top;
+}
+
+table.diff-table thead th {
+  background: var(--panel);
+  font-weight: 600;
+}
+
+table.diff-table tbody tr.row-added td {
+  background: var(--add-bg);
+  border-color: var(--add-border);
+}
+
+table.diff-table tbody tr.row-added td:first-child {
+  border-left: 3px solid var(--add-border);
+}
+
+table.diff-table tbody tr.row-removed td {
+  background: var(--del-bg);
+  border-color: var(--del-border);
+  text-decoration: line-through;
+  text-decoration-color: rgba(248, 81, 73, 0.55);
+}
+
+table.diff-table tbody tr.row-removed td:first-child {
+  border-left: 3px solid var(--del-border);
+}
 
 .empty {
   color: var(--muted);
@@ -330,3 +406,67 @@ a:hover {
 }
 
 .summary span strong { color: var(--text); }
+
+html:has(body.diff-mode),
+body.diff-mode {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+html:has(body.diff-mode)::-webkit-scrollbar,
+body.diff-mode::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+  background: transparent;
+}
+
+body.diff-mode {
+  padding-right: 14px;
+}
+
+#minimap {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 14px;
+  height: 100vh;
+  background: var(--panel);
+  border-left: 1px solid var(--border);
+  z-index: 20;
+  cursor: pointer;
+}
+
+#minimap:hover {
+  width: 22px;
+}
+
+.minimap-mark {
+  position: absolute;
+  left: 2px;
+  right: 2px;
+  min-height: 3px;
+  border-radius: 1px;
+  cursor: pointer;
+  opacity: 0.85;
+}
+
+.minimap-mark:hover {
+  opacity: 1;
+  outline: 1px solid var(--text);
+}
+
+.minimap-mark.mark-add { background: var(--add-border); }
+.minimap-mark.mark-del { background: var(--del-border); }
+.minimap-mark.mark-mod { background: var(--accent); }
+
+#minimap-viewport {
+  position: absolute;
+  left: 0;
+  right: 0;
+  background: rgba(88, 166, 255, 0.18);
+  border-top: 1px solid var(--link);
+  border-bottom: 1px solid var(--link);
+  pointer-events: none;
+  transition: top 0.05s linear;
+}

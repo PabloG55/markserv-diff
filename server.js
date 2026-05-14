@@ -60,24 +60,29 @@ function escapeHtml(s) {
     .replace(/"/g, '&quot;');
 }
 
-function renderTree(node, activeRelPath, changedByPath) {
+function renderTree(node, activeRelPath, changedByPath, linkMode = 'diff') {
   if (!node.children || node.children.length === 0) return '';
   const items = node.children
     .map((child) => {
       if (child.children) {
-        const inner = renderTree(child, activeRelPath, changedByPath);
+        const inner = renderTree(child, activeRelPath, changedByPath, linkMode);
         return `<li class="folder">${escapeHtml(child.name)}${inner}</li>`;
       }
       const isActive = child.relPath === activeRelPath;
       const status = changedByPath.get(child.relPath);
       const dot = status ? `<span class="status-dot status-${status}" title="${status}"></span>` : '';
-      return `<li><a href="/file/${encodeURI(child.relPath)}" class="${isActive ? 'active' : ''}">${dot}${escapeHtml(child.name)}</a></li>`;
+      const href = linkMode === 'view'
+        ? `/file/${encodeURI(child.relPath)}`
+        : `/diff/${encodeURI(child.relPath)}?base=${linkMode === 'main' ? 'main' : 'head'}`;
+      return `<li><a href="${href}" class="${isActive ? 'active' : ''}">${dot}${escapeHtml(child.name)}</a></li>`;
     })
     .join('');
   return `<ul>${items}</ul>`;
 }
 
-function layout({ title, sidebar, main }) {
+function layout({ title, sidebar, main, mode }) {
+  const bodyClass = mode === 'diff' ? 'diff-mode' : '';
+  const minimap = mode === 'diff' ? '<div id="minimap" aria-hidden="true"></div>' : '';
   return `<!doctype html>
 <html lang="en">
 <head>
@@ -85,10 +90,11 @@ function layout({ title, sidebar, main }) {
 <title>${escapeHtml(title)}</title>
 <link rel="stylesheet" href="/static/styles.css" />
 </head>
-<body>
+<body class="${bodyClass}">
 <div class="layout">
   <aside class="sidebar">${sidebar}</aside>
   <main class="main">${main}</main>
+  ${minimap}
 </div>
 <script src="/static/client.js"></script>
 </body>
@@ -104,9 +110,9 @@ function tabs(relPath, mode) {
   return `<div class="tabs">${link('view', 'View')}${link('diff-head', 'Diff vs HEAD')}${link('diff-main', 'Diff vs main')}</div>`;
 }
 
-async function buildSidebar(activeRelPath, changedByPath) {
+async function buildSidebar(activeRelPath, changedByPath, linkMode = 'diff') {
   const tree = await walk(targetDir);
-  return `<div class="brand">markserv<strong>·diff</strong></div><nav class="tree">${renderTree(tree, activeRelPath, changedByPath)}</nav>`;
+  return `<div class="brand">markserv<strong>·diff</strong></div><nav class="tree">${renderTree(tree, activeRelPath, changedByPath, linkMode)}</nav>`;
 }
 
 async function getChangedMap(root, base) {
@@ -133,7 +139,7 @@ async function handleFile(req, res, relPath) {
   const html = renderMarkdown(text);
   const root = await git.repoRoot(targetDir);
   const changed = await getChangedMap(root, 'head');
-  const sidebar = await buildSidebar(relPath, changed);
+  const sidebar = await buildSidebar(relPath, changed, 'view');
   const main = `
     <div class="toolbar">
       <h1><span class="file-path">${escapeHtml(relPath)}</span></h1>
@@ -189,13 +195,13 @@ async function handleDiff(req, res, relPath, base) {
   }
 
   const changed = await getChangedMap(root, base);
-  const sidebar = await buildSidebar(relPath, changed);
+  const sidebar = await buildSidebar(relPath, changed, base === 'main' ? 'main' : 'head');
   const toolbar = `
     <div class="toolbar">
       <h1><span class="file-path">${escapeHtml(relPath)}</span></h1>
       ${tabs(relPath, base === 'main' ? 'diff-main' : 'diff-head')}
     </div>`;
-  send(res, 200, 'text/html; charset=utf-8', layout({ title: `diff: ${relPath}`, sidebar, main: toolbar + main }));
+  send(res, 200, 'text/html; charset=utf-8', layout({ title: `diff: ${relPath}`, sidebar, main: toolbar + main, mode: 'diff' }));
 }
 
 async function handleIndex(req, res) {
@@ -204,7 +210,7 @@ async function handleIndex(req, res) {
   const tree = await walk(targetDir);
   const firstFile = findFirstFile(tree);
   if (firstFile) {
-    res.writeHead(302, { Location: `/file/${encodeURI(firstFile)}` });
+    res.writeHead(302, { Location: `/diff/${encodeURI(firstFile)}?base=head` });
     return res.end();
   }
   const sidebar = await buildSidebar(null, changed);
